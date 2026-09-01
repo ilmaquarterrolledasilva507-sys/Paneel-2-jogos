@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Gerador de Rifas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.9.3/html2canvas.min.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #eef2f5; padding: 10px; }
+        .painel { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
+        input, button { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { background: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; }
+        #arte {
+            width: 1080px; height: 1080px; background: linear-gradient(45deg, #11998e, #38ef7d);
+            color: white; position: relative; overflow: hidden; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            transform: scale(0.3); transform-origin: top left; margin-bottom: -750px;
+        }
+        video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.5; z-index: 0; }
+        .conteudo { z-index: 1; padding: 40px; }
+        h2 { font-size: 80px; margin: 0; text-shadow: 2px 2px 5px black; }
+        img { width: 80%; border: 8px solid white; border-radius: 20px; margin: 30px 0; }
+        .preco { background: yellow; color: black; font-size: 60px; padding: 10px 40px; border-radius: 50px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="painel">
+        <h3>🎨 Criar Arte da Rifa</h3>
+        <input type="text" id="titulo" placeholder="Título (ex: Rifa do iPhone)" oninput="atualizar()">
+        <input type="text" id="linkVideo" placeholder="Link do Vídeo (.mp4)" onchange="mudarVideo()">
+        <input type="text" id="linkFoto" placeholder="Link da Foto do Prêmio" oninput="atualizar()">
+        <input type="text" id="valor" placeholder="Valor (ex: R$ 10,00)" oninput="atualizar()">
+        <input type="number" id="qtd" placeholder="Quantidade de Números">
+        <button onclick="baixar()">📸 Baixar Imagem</button>
+        <button onclick="salvar()" style="background:#007bff">💾 Salvar Campanha no Site</button>
+    </div>
+    <div id="arte">
+        <video id="vid" autoplay muted loop playsinline><source src="" type="video/mp4"></video>
+        <div class="conteudo">
+            <h2 id="vTitulo">TÍTULO</h2>
+            <img id="vFoto" src="https://via.placeholder.com/500">
+            <div class="preco" id="vValor">VALOR</div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        function atualizar() {
+            document.getElementById('vTitulo').innerText = document.getElementById('titulo').value;
+            document.getElementById('vValor').innerText = document.getElementById('valor').value;
+            if(document.getElementById('linkFoto').value) document.getElementById('vFoto').src = document.getElementById('linkFoto').value;
+        }
+        function mudarVideo() { document.getElementById('vid').src = document.getElementById('linkVideo').value; }
+        function baixar() {
+            html2canvas(document.getElementById('arte'), {scale: 1}).then(c => {
+                let a = document.createElement('a'); a.download = 'rifa.png'; a.href = c.toDataURL(); a.click();
+            });
+        }
+        function salvar() {
+            let rifa = { id: Date.now(), titulo: document.getElementById('titulo').value, imagem: document.getElementById('linkFoto').value, preco: document.getElementById('valor').value, total: document.getElementById('qtd').value, vendidos: [] };
+            let lista = JSON.parse(localStorage.getItem('rifas')) || [];
+            lista.push(rifa);
+            localStorage.setItem('rifas', JSON.stringify(lista));
+            alert("Campanha salva! Veja no index.html");
+        }
+    </script>
+</body>
+</html>

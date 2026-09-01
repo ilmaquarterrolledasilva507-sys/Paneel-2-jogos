@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rifas Online</title>
+<style>
+body{font-family:sans-serif;padding:20px;background:#f4f4f9;margin:0}
+h1{text-align:center;color:#333}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.card{background:white;padding:15px;border-radius:10px;box-shadow:0 4px 8px rgba(0,0,0,.1);text-align:center}
+.card img{width:100%;height:200px;object-fit:cover;border-radius:8px}
+.btn{background:#007bff;color:white;padding:10px 20px;text-decoration:none;display:inline-block;margin-top:10px;border-radius:5px}
+.vazio{text-align:center;color:#666;background:white;padding:20px;border-radius:10px}
+</style>
+</head>
+<body>
+<h1>🎟️ Sorteios Ativos</h1>
+<div class="grid" id="listaRifas"></div>
+
+<script>
+function escapar(texto){
+    return String(texto ?? '').replace(/[&<>"']/g, function(c){
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+}
+
+function carregarRifas(){
+    const container=document.getElementById('listaRifas');
+    if(!container) return;
+
+    let rifas=[];
+    try{
+        rifas=JSON.parse(localStorage.getItem('rifas')) || [];
+    }catch(e){
+        rifas=[];
+    }
+
+    container.innerHTML='';
+
+    if(rifas.length===0){
+        container.innerHTML='<div class="vazio">Nenhum sorteio ativo no momento.</div>';
+        return;
+    }
+
+    rifas.forEach(function(r){
+        const total=Number(r.total)||0;
+        const vendidos=Array.isArray(r.vendidos)?r.vendidos.length:0;
+        const restantes=Math.max(0,total-vendidos);
+
+        const div=document.createElement('div');
+        div.className='card';
+
+        div.innerHTML=
+            '<img src="'+escapar(r.imagem || 'https://via.placeholder.com/500')+'" alt="Prêmio">'+
+            '<h3>'+escapar(r.titulo || 'Rifa')+'</h3>'+
+            '<p>Preço: '+escapar(r.preco || 'Não informado')+'</p>'+
+            '<p>Restam: '+restantes+' números</p>'+
+            '<a href="#" class="btn" data-id="'+escapar(r.id)+'">Comprar</a>';
+
+        div.querySelector('.btn').addEventListener('click',function(e){
+            e.preventDefault();
+            alert('Compra da rifa "'+(r.titulo || 'Rifa')+'" selecionada.');
+        });
+
+        container.appendChild(div);
+    });
+}
+
+carregarRifas();
+</script>
+</body>
+</html>
