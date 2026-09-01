@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rifas Online</title>
+    <title>Minhas Rifas Online</title>
     <style>
         body { font-family: sans-serif; padding: 20px; background-color: #f4f4f9; }
         h1 { text-align: center; color: #333; }
@@ -16,7 +16,29 @@
 <body>
     <h1>🎟️ Sorteios Ativos</h1>
     <div class="grid" id="listaRifas"></div>
-    <script src="script.js"></script>
-    <script> carregarRifas(); </script>
+    
+    <script>
+        function carregarRifas() {
+            let container = document.getElementById('listaRifas');
+            let rifas = JSON.parse(localStorage.getItem('rifas')) || [];
+            container.innerHTML = '';
+            if(rifas.length === 0) {
+                container.innerHTML = '<p style="text-align:center; width:100%">Nenhuma rifa cadastrada ainda.</p>';
+                return;
+            }
+            rifas.forEach(r => {
+                let div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <img src="${r.imagem}">
+                    <h3>${r.titulo}</h3>
+                    <p>Preço: ${r.preco}</p>
+                    <p>Restam: ${r.total - r.vendidos.length} números</p>
+                    <a href="#" class="btn">Comprar</a>
+                `;
+                container.appendChild(div);
+            });
+        }
+        window.onload = carregarRifas;
+    </script>
 </body>
-</html>
